@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理系统</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f7;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            font-size: 12px;
+            box-sizing: border-box; /* 使用 box-sizing 包含边距和边框 */
+        }
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.1);
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .loading-message {
+            font-size: 24px;
+            color: #4A90E2;
+            font-weight: bold;
+        }
+        .container{
+            width: 95vw;
+            height: calc(90vh - 20px); /* 高度减去内边距 */
+            margin: 20px;
+            box-sizing: border-box; /* 包含内边距在内的总尺寸 */
+        }
+        .title{
+            padding: 10px 0;
+            margin: 10px 0;
+            background-color: #f4f4f4; /* 背景色 */
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .top-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 5%;
+            background-color: #e5e5e5;
+            border-radius: 3px;
+        }
+        .bottom-container{
+            height: 90%;
+            border: 1px solid #d3d3d3;
+            border-radius: 3px;
+            border-top: none; /* 去除顶部边框 */
+        }
+        .left-sidebar{
+            height: 100%;
+            width: 30%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .left-sidebar span{
+            display: flex; /* 使用 flexbox */
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 (可选) */
+            gap: 3px;
+            padding: 6px 15px;
+            border-radius: 5px;
+            margin-left: 20px;
+            cursor: pointer;
+            color: #f0f4f7;
+            background-color: #686868;
+        }
+        .left-sidebar span:hover{
+            background-color: #b1b1b1;
+            /*-- 过渡一下 --*/
+            transition: background-color 0.5s ease;
+        }
+        .right-sidebar{
+            width: 25%;
+            height: 70%;
+            display: flex;
+            margin-right: 10px;
+            align-items: center;
+            justify-content: space-around;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+        .search{
+            height: 80%;
+            width: 75%;
+            outline: none;
+            border: 1px solid #ffffff;
+            padding: 0 5px;
+        }
+        .icon{
+            /*--悬浮手势--*/
+            cursor: pointer;
+        }
+        #regularUsersList {
+            width: 100%;
+            max-height: 400px; /* 限制表格最大高度 */
+            overflow-y: auto;  /* 启用垂直滚动条 */
+            border-collapse: collapse;  /* 去除表格单元格之间的间隙 */
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="title">谷歌地图用户管理后台</h2>
+    <!-- 顶部容器 -->
+    <div class="top-container">
+        <!-- 左侧栏 -->
+        <div class="left-sidebar">
+            <span onclick="window.location.href = 'userList.html'">
+                <svg t="1733291696926" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8405" width="20" height="20"><path d="M811.243897 474.271724 543.496853 474.271724 543.496853 212.752522c0-17.396205-14.102183-31.499411-31.498388-31.499411s-31.500435 14.104229-31.500435 31.499411l0 261.519202L212.75508 474.271724c-17.396205 0-31.499411 14.103206-31.499411 31.497365 0 17.397229 14.104229 31.500435 31.499411 31.500435l267.743974 0 0 273.977955c0 17.379832 14.104229 31.500435 31.500435 31.500435s31.498388-14.120602 31.498388-31.500435L543.497876 537.269523l267.74602 0c17.396205 0 31.498388-14.103206 31.498388-31.500435C842.742285 488.37493 828.640102 474.271724 811.243897 474.271724z" p-id="8406" fill="#ffffff"></path></svg>
+                添加
+            </span>
+            <span id="regularUsers">
+                <svg t="1733292040294" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9488" width="20" height="20"><path d="M607.897867 768.043004c-17.717453 0-31.994625-14.277171-31.994625-31.994625L575.903242 383.935495c0-17.717453 14.277171-31.994625 31.994625-31.994625s31.994625 14.277171 31.994625 31.994625l0 351.94087C639.892491 753.593818 625.61532 768.043004 607.897867 768.043004z" fill="#ffffff" p-id="9489"></path><path d="M415.930119 768.043004c-17.717453 0-31.994625-14.277171-31.994625-31.994625L383.935495 383.935495c0-17.717453 14.277171-31.994625 31.994625-31.994625 17.717453 0 31.994625 14.277171 31.994625 31.994625l0 351.94087C447.924744 753.593818 433.647573 768.043004 415.930119 768.043004z" fill="#ffffff" p-id="9490"></path><path d="M928.016126 223.962372l-159.973123 0L768.043004 159.973123c0-52.980346-42.659499-95.983874-95.295817-95.983874L351.94087 63.989249c-52.980346 0-95.983874 43.003528-95.983874 95.983874l0 63.989249-159.973123 0c-17.717453 0-31.994625 14.277171-31.994625 31.994625s14.277171 31.994625 31.994625 31.994625l832.032253 0c17.717453 0 31.994625-14.277171 31.994625-31.994625S945.73358 223.962372 928.016126 223.962372zM319.946246 159.973123c0-17.545439 14.449185-31.994625 31.994625-31.994625l320.806316 0c17.545439 0 31.306568 14.105157 31.306568 31.994625l0 63.989249L319.946246 223.962372 319.946246 159.973123 319.946246 159.973123z" fill="#ffffff" p-id="9491"></path><path d="M736.048379 960.010751 288.123635 960.010751c-52.980346 0-95.983874-43.003528-95.983874-95.983874L192.139761 383.591466c0-17.717453 14.277171-31.994625 31.994625-31.994625s31.994625 14.277171 31.994625 31.994625l0 480.435411c0 17.717453 14.449185 31.994625 31.994625 31.994625l448.096758 0c17.717453 0 31.994625-14.277171 31.994625-31.994625L768.215018 384.795565c0-17.717453 14.277171-31.994625 31.994625-31.994625s31.994625 14.277171 31.994625 31.994625l0 479.231312C832.032253 916.835209 789.028725 960.010751 736.048379 960.010751z" fill="#ffffff" p-id="9492"></path></svg>
+                删除
+            </span>
+        </div>
+        <!-- 右侧栏 -->
+        <div class="right-sidebar">
+            <input class="search" type="text" placeholder="请输入账号...">
+            <svg id="clickSearch" t="1733291034008" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2497" width="25" height="25"><path d="M448 768c176.725333 0 320-143.274667 320-320 0-176.725333-143.274667-320-320-320-176.725333 0-320 143.274667-320 320 0 176.725333 143.274667 320 320 320z m0 42.666667c-200.298667 0-362.666667-162.368-362.666667-362.666667S247.701333 85.333333 448 85.333333s362.666667 162.368 362.666667 362.666667-162.368 362.666667-362.666667 362.666667z m304.917333-27.584a21.333333 21.333333 0 0 1 30.165334-30.165334l150.848 150.848a21.333333 21.333333 0 0 1-30.165334 30.165334l-150.848-150.826667z" fill="#3D3D3D" p-id="2498"></path></svg>
+        </div>
+    </div>
+    <!-- 底部容器 -->
+    <div class="bottom-container">
+        <table id="regularUsersList" style="table-layout: fixed; width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="height: 30px;">
+                    <th style="border-bottom: 1px solid #d6d6d6;">选择</th>
+                    <th style="border-bottom: 1px solid #d6d6d6;">ID序号</th>
+                    <th style="border-bottom: 1px solid #d6d6d6;">账号</th>
+                    <th style="border-bottom: 1px solid #d6d6d6;">密码</th>
+                    <th style="border-bottom: 1px solid #d6d6d6;">类型</th>
+                    <th style="border-bottom: 1px solid #d6d6d6;">创建时间</th>
+                    <th style="border-bottom: 1px solid #d6d6d6;">到期时间</th>
+                    <th style="border-bottom: 1px solid #d6d6d6;">状态</th>
+                    <th style="border-bottom: 1px solid #d6d6d6;">设置</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 数据行会在这里动态插入 -->
+            </tbody>
+        </table>
+    </div>
+    <!-- 加载容器 -->
+    <div class="loading-container" id="loadingContainer">
+        <div class="loading-message">加载中，请稍候...</div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 用户管理系统 | 所有权利保留</p>
+    </div>
+</div>
+
+<script>
+    // 用来存储用户数据的数组
+    let users = [];
+    let searchTimeout = null;
+
+    // 获取用户数据并展示
+    async function fetchUsers() {
+        try {
+            const response = await fetch('/.netlify/functions/getUsers');
+            const usersData = await response.json();
+            // 检查返回的数据是否为空或不是数组
+            if (Array.isArray(usersData) && usersData.length > 0) {
+                users = usersData;
+                console.log(users)
+                // 隐藏加载容器
+                document.getElementById('loadingContainer').style.display = 'none';
+                displayUsers();
+            } else {
+                alert('没有获取到用户数据');
+            }
+        } catch (error) {
+            console.error('获取用户时出错:', error);
+            alert('获取用户列表失败');
+        }
+    }
+
+
+
+    // 获取搜索图标和输入框元素
+    const searchInput = document.querySelector('.search');
+    const searchButton = document.querySelector('#clickSearch');
+
+    // 监听搜索按钮点击事件
+    searchButton.addEventListener('click', function() {
+        const searchText = searchInput.value.toLowerCase().trim();  // 获取输入框的值，并转换为小写
+
+        if (searchText) {
+            filterUsers(searchText);  // 调用过滤函数
+        } else {
+            // 如果输入框为空，则显示所有用户
+            displayUsers(users);
+        }
+    });
+
+    // 过滤用户数据并重新渲染表格
+    function filterUsers(searchText) {
+        const filteredUsers = users.filter(user => {
+            return user.username.toLowerCase().includes(searchText);  // 根据用户名进行搜索
+        });
+        console.log(filteredUsers);
+        // 重新渲染表格
+        displayUsers(filteredUsers);
+    }
+
+
+
+    // 展示正式用户和试用用户
+    function displayUsers(filteredUsers = users) {
+        const regularUsersList = document.getElementById('regularUsersList');
+
+        // 查找表格的 tbody 部分
+        let tableBody = regularUsersList.querySelector('tbody');
+
+        // 如果表格没有tbody，则需要动态创建一个
+        if (!tableBody) {
+            tableBody = document.createElement('tbody');
+            regularUsersList.appendChild(tableBody);
+        } else {
+            // 清空已有的 tbody 内容
+            tableBody.innerHTML = '';
+        }
+
+        // 遍历用户数据并生成表格行
+        filteredUsers.forEach((user, index) => {
+            const row = document.createElement('tr');  // 创建新的表格行
+
+            // 勾选框
+            const checkboxCell = document.createElement('td');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = user.checked || false;
+            checkbox.setAttribute('data-user-id', user._id);
+            checkboxCell.appendChild(checkbox);
+            row.appendChild(checkboxCell);
+
+            // 生成 id（从 1 开始递增）
+            const idCell = document.createElement('td');
+            idCell.textContent = index + 1;  // 使用索引+1作为ID
+            row.appendChild(idCell);
+
+            const usernameCell = document.createElement('td');
+            usernameCell.textContent = user.username;
+            row.appendChild(usernameCell);
+
+            const passwordCell = document.createElement('td');
+            passwordCell.textContent = user.password;
+            row.appendChild(passwordCell);
+
+            const typeCell = document.createElement('td');
+            typeCell.textContent = user.user_type === "regular" ? "正式用户" : "试用用户";
+            row.appendChild(typeCell);
+
+            const createdAtCell = document.createElement('td');
+            createdAtCell.textContent = user.created_at;  // 假设用户数据包含 created_at 字段
+            row.appendChild(createdAtCell);
+
+            // 到期的时间
+            const timeLimitCell = document.createElement('td');
+            // 检查 expiration_date 是否有效
+            if (!user.expiration_date || isNaN(new Date(user.expiration_date).getTime())) {
+                timeLimitCell.textContent = "用户暂未开通";  // 如果无效或未设置，显示默认消息
+            } else {
+                timeLimitCell.textContent = user.expiration_date;
+            }
+            row.appendChild(timeLimitCell);
+
+            // 状态
+            const stateCell = document.createElement('td');
+            if (!user.expiration_date || isNaN(new Date(user.expiration_date).getTime())) {
+                stateCell.textContent = "用户暂未开通";  // 如果无效或未设置，显示默认消息
+            } else {
+                // 比对当前的时间
+                const currentDate = new Date();  // 获取当前时间
+                const expirationDate = new Date(user.expiration_date);  // 转换用户的到期时间为 Date 对象
+
+                if (expirationDate < currentDate) {
+                    stateCell.textContent = "用户已过期";  // 如果到期时间早于当前时间，显示“已过期”
+                } else {
+                    stateCell.textContent = "用户有效";  // 否则显示“用户有效”
+                }
+            }
+            row.appendChild(stateCell);
+
+            // 编辑
+            const editCell = document.createElement('td');
+            const editButton = document.createElement('button');
+            editButton.textContent = "编辑";  // 按钮文本
+            editButton.classList.add('edit-button');  // 添加类名用于样式
+            editButton.setAttribute('data-user-id', user._id);  // 添加自定义属性存储用户ID
+
+            editCell.appendChild(editButton);
+            row.appendChild(editCell);
+
+
+            // 给每个 <td> 加上与 <th> 相同的样式
+            const cells = row.querySelectorAll('td');
+            cells.forEach(cell => {
+                cell.style.borderBottom = '1px solid #d6d6d6';
+                cell.style.padding = '10px';
+                cell.style.textAlign = 'left';
+                cell.style.textAlign = 'center';  // 水平居中
+
+                // 设置内容溢出处理：隐藏溢出内容
+                cell.style.overflow = 'hidden';
+                cell.style.textOverflow = 'ellipsis';  // 溢出时显示省略号
+                cell.style.whiteSpace = 'nowrap';  // 防止换行
+            });
+
+            // 将行添加到 tbody 中
+            tableBody.appendChild(row);
+        });
+
+        // 添加事件监听器到所有编辑按钮
+        const editButtons = document.querySelectorAll('.edit-button');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = this.getAttribute('data-user-id');
+                // 将用户ID作为URL参数传递
+                window.location.href = `editUser.html?userId=${encodeURIComponent(userId)}`;
+            });
+        });
+    }
+
+
+
+
+    // 编辑用户
+    function editUser(userId) {
+        const user = users.find(u => u._id === userId);
+        if (user) {
+            document.getElementById('username').value = user.username;
+            document.getElementById('password').value = user.password || '';  // 如果没有密码则为空
+            document.getElementById('userType').value = user.user_type;
+            document.getElementById('userForm').onsubmit = function(event) {
+                event.preventDefault();
+                updateUser(userId);
+            };
+        }
+    }
+
+    // 更新用户信息
+    async function updateUser(userId) {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const userType = document.getElementById('userType').value;
+
+        try {
+            const response = await fetch('/.netlify/functions/updateUser', {
+                method: 'POST',
+                body: JSON.stringify({ userId, username, password, userType }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert('用户更新成功');
+                fetchUsers(); // 重新加载用户数据
+            } else {
+                alert('更新失败');
+            }
+        } catch (error) {
+            console.error('更新用户时出错:', error);
+        }
+    }
+
+    const deleteButton = document.getElementById('regularUsers');
+    // 为删除按钮添加事件监听
+    deleteButton.addEventListener('click', deleteSelectedUsers);
+
+    // 删除勾选的用户
+    async function deleteSelectedUsers() {
+        // 获取所有勾选框
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+        console.log(checkboxes);
+
+        // 如果没有勾选任何用户，则提醒
+        if (checkboxes.length === 0) {
+            alert('请选择至少一个用户删除');
+            return;
+        }
+
+        // 获取选中的用户ID
+        const selectedUserIds = [];
+        checkboxes.forEach(checkbox => {
+            const userId = checkbox.getAttribute('data-user-id');  // 获取勾选框的自定义属性userId
+            console.log(userId);
+            selectedUserIds.push(userId);
+        });
+
+        // 调用后端接口删除选中的用户
+        try {
+            const response = await fetch('/.netlify/functions/deleteUser', {
+                method: 'POST',
+                body: JSON.stringify({ userIds: selectedUserIds }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert('选中的用户已删除');
+                fetchUsers();  // 删除成功后刷新用户列表
+            } else {
+                alert('删除失败');
+            }
+        } catch (error) {
+            console.error('删除用户时出错:', error);
+            alert('删除失败');
+        }
+    }
+
+
+    // 页面加载时获取用户列表
+    window.onload = fetchUsers;
+</script>
+
+</body>
+</html>
