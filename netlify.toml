@@ -20,7 +20,7 @@
 
 # 删除不必要的重定向规则，因为你已经通过函数处理用户请求
 [[redirects]]
-  from = "/users/*"
+  from = "/getUsers"
   to = "/.netlify/functions/getUsers"
   status = 200
   force = true
