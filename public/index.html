@@ -179,7 +179,7 @@
     // 获取用户数据并展示
     async function fetchUsers() {
         try {
-            const response = await fetch('/.netlify/functions/getUsers');
+            const response = await fetch('./.netlify/functions/getUsers');
             const usersData = await response.json();
             // 检查返回的数据是否为空或不是数组
             if (Array.isArray(usersData) && usersData.length > 0) {
