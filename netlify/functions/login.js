@@ -122,14 +122,15 @@ exports.handler = async function(event, context) {
       };
 
     } catch (err) {
-      console.error("数据库连接错误:", err);
+      console.error("数据库连接错误:", err.message);  // 打印错误消息
+      console.error("详细错误信息:", err);  // 打印整个错误对象
       return {
-        statusCode: 500,
-        body: JSON.stringify({ message: "数据库连接错误" }),
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-            "Access-Control-Allow-Headers": "Content-Type"
+          statusCode: 500,
+          body: JSON.stringify({ message: "数据库连接错误", error: err.message }),
+          headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+              "Access-Control-Allow-Headers": "Content-Type"
           }
       };
     }
