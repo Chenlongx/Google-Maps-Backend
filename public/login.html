@@ -19,7 +19,43 @@
             align-items: center;
             height: 100vh;
         }
+        /* 背景样式：为 loading container 设置背景 */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);  /* 半透明背景 */
+            z-index: 9999;  /* 确保它位于页面最上层 */
+            flex-direction: column;  /* 垂直方向排列 */
+            color: white;
+        }
 
+        /* 加载中的文字样式 */
+        .loading-message {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* 旋转动画的样式 */
+        .spinner {
+            border: 8px solid #f3f3f3; /* 轻灰色背景 */
+            border-top: 8px solid #3498db; /* 深蓝色的上边框 */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite; /* 旋转动画 */
+        }
+
+        /* 旋转动画关键帧 */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .login-container {
             background-color: #fff;
             border-radius: 8px;
@@ -103,6 +139,10 @@
         <!-- 忘记密码链接 -->
         <a href="#" class="forgot-password" >忘记密码?</a>
     </div>
+    <!-- 加载容器 -->
+    <div class="loading-container" id="loadingContainer" style="display: none">
+        <div class="loading-message">加载中，请稍候...</div>
+    </div>
     <script>
         // 获取表单元素
         const loginForm = document.getElementById('loginForm');
@@ -123,6 +163,9 @@
             }
             console.log(username, password);
             try {
+                // 显示加载器
+                document.getElementById('loadingContainer').style.display = 'flex';
+
                 // 发起登录请求
                 const response = await fetch('/api/login', {
                     method: 'POST',
@@ -135,8 +178,11 @@
                 const data = await response.json();
 
                 if (response.ok) {
+                    // 隐藏加载器
+                    document.getElementById('loadingContainer').style.display = 'none';
+
                     // 登录成功
-                    alert("登录成功！");
+                    // alert("登录成功！");
 
                     // 将 token 存储到 localStorage 中
                     localStorage.setItem('authToken', data.token);
