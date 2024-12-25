@@ -116,6 +116,52 @@
             font-size: 14px;
             color: #888;
         }
+
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .top-container {
+                flex-direction: column;
+                height: 13%;
+            }
+            .left-sidebar {
+                width: 100%;
+            }
+            .right-sidebar {
+                width: 98%;
+                margin-left: 10px;
+                border-radius: 2px;
+            }
+            .search {
+                width: 100%;
+            }
+            .left-sidebar span{
+                margin-left: 10px;
+            }
+            #regularUsersList{
+                font-size: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                margin: 10px;
+            }
+            .loading-message {
+                font-size: 18px;
+            }
+            .title {
+                font-size: 15px;
+                padding: 5px 0;
+            }
+            .search {
+                font-size: 14px;
+            }
+            .footer {
+                font-size: 10px;
+            }
+        }
     </style>
 </head>
 <body>
