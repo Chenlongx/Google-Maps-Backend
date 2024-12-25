@@ -110,6 +110,23 @@
             background-color: #45a049;
         }
 
+        /* 密码显示/隐藏按钮样式 */
+        .input-container {
+            position: relative;
+        }
+        .toggle-btn {
+            position: absolute;
+            right: 10px; /* 距离容器右边10px */
+            top: 50%; /* 垂直居中 */
+            transform: translateY(-50%); /* 使按钮完全居中 */
+            cursor: pointer;
+            font-size: 18px;
+            color: #777;
+            transition: color 0.3s;
+        }
+        .toggle-btn:hover {
+            color: #333;
+        }
         .forgot-password {
             color: #4CAF50;
             font-size: 14px;
@@ -132,7 +149,11 @@
         <!-- 登录表单 -->
         <form id="loginForm">
             <input type="text" id="username" class="input-field" placeholder="用户名" required>
-            <input type="password" id="password" class="input-field" placeholder="密码" required>
+            <!-- 密码输入框和显示/隐藏按钮 -->
+            <div class="input-container">
+                <input type="password" id="password" class="input-field" placeholder="密码" required>
+                <span id="togglePassword" class="toggle-btn">👁️</span>
+            </div>
             <button type="submit" class="login-button">登录</button>
         </form>
 
@@ -148,6 +169,17 @@
         const loginForm = document.getElementById('loginForm');
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const togglePassword = document.getElementById('togglePassword');
+
+        // 切换密码显示/隐藏
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+
+            // 切换图标
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
 
         // 监听表单提交
         loginForm.addEventListener('submit', async (event) => {
