@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');  // 用于密码哈希校验
 const jwt = require('jsonwebtoken'); // 用于生成 JWT
 
-require('dotenv').config();  // 加载 .env 文件中的环境变量
+// require('dotenv').config();  // 加载 .env 文件中的环境变量
 
 
 // MongoDB Atlas 连接字符串
@@ -79,11 +79,40 @@ exports.handler = async function(event, context) {
         };
       }
 
+      // 生成 JWT Token
+      const payload = {
+        username: user.username,
+        user_type: user.user_type,
+      };
+
+      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });  // 使用从 .env 文件中加载的 JWT 密钥
+
+      // 检查数据库是否已有 token，如果有，则替换
+      const updateResult = await collection.updateOne(
+          { username },
+          { $set: { token } }  // 更新用户的 token
+      );
+
+      // 检查更新操作是否成功
+      if (updateResult.modifiedCount === 0) {
+        // 如果更新失败，说明没有修改任何记录（可能是 token 本身没变）
+        console.log("Token 更新失败");
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: "Token 更新失败" }),
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+                "Access-Control-Allow-Headers": "Content-Type"
+            }
+        };
+      }
 
       // 返回用户信息，登录成功
       return {
         statusCode: 200,
         body: JSON.stringify({ message: "登录成功", user: { username: user.username, user_type: user.user_type },
+        token,  // 返回 token
       }),
         headers: {
             "Access-Control-Allow-Origin": "*",
