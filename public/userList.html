@@ -155,61 +155,85 @@
 
 
     <script>
-        // 获取表单元素
-        const createUserForm = document.getElementById('createUserForm');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const userTypeSelect = document.getElementById('userType');
-        const timeLimitContainer = document.getElementById('timeLimitContainer');
-        const timeLimitSelect = document.getElementById('timeLimit');
+        // 封装检查 token 的函数
+        function checkAuthToken() {
+            // 从 localStorage 中获取 token
+            const token = localStorage.getItem('authToken');
 
-        // 监听用户类型选择变化
-        userTypeSelect.addEventListener('change', () => {
-            if (userTypeSelect.value === 'regular') {
-                // 如果选择正式用户，显示时间选择框
-                timeLimitContainer.style.display = 'block';
-            } else {
-                // 如果选择试用用户，隐藏时间选择框
-                timeLimitContainer.style.display = 'none';
+            // 如果 token 不存在，提示用户需要登录
+            if (!token) {
+                alert('请先登录');
+                window.location.href = 'login.html';  // 跳转到登录页面
+                return false; // 返回 false 表示没有 token
             }
-        });
+            return true; // 返回 true 表示 token 存在
+        }
 
-        // 监听表单提交
-        createUserForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+        // 页面加载时检查是否有 token
+        window.onload = function() {
+            if (!checkAuthToken()) {
+                return;  // 如果没有 token，阻止后续代码执行
+            }
 
-            const username = usernameInput.value;
-            const password = passwordInput.value;
-            const userType = userTypeSelect.value;
-            const timeLimit = userType === 'regular' ? timeLimitSelect.value : 'none'; // 默认值为 'none' 表示不适用时间限制
-            console.log(username, password, userType, timeLimit);
-            try {
-                const response = await fetch('/.netlify/functions/createUser', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password, userType, timeLimit }),
-                });
-                const result = await response.json();
+            // 获取表单元素
+            const createUserForm = document.getElementById('createUserForm');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const userTypeSelect = document.getElementById('userType');
+            const timeLimitContainer = document.getElementById('timeLimitContainer');
+            const timeLimitSelect = document.getElementById('timeLimit');
+            const token = localStorage.getItem('authToken');
 
-                if (result.success) {
-                    alert('用户添加成功');
-                    // 重新刷新页面
-                    window.location.reload();
+            // 监听用户类型选择变化
+            userTypeSelect.addEventListener('change', () => {
+                if (userTypeSelect.value === 'regular') {
+                    // 如果选择正式用户，显示时间选择框
+                    timeLimitContainer.style.display = 'block';
                 } else {
+                    // 如果选择试用用户，隐藏时间选择框
+                    timeLimitContainer.style.display = 'none';
+                }
+            });
+
+            // 监听表单提交
+            createUserForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const username = usernameInput.value;
+                const password = passwordInput.value;
+                const userType = userTypeSelect.value;
+                const timeLimit = userType === 'regular' ? timeLimitSelect.value : 'none'; // 默认值为 'none' 表示不适用时间限制
+                console.log(username, password, userType, timeLimit);
+                try {
+                    const response = await fetch('/.netlify/functions/createUser', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ username, password, userType, timeLimit }),
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert('用户添加成功');
+                        // 重新刷新页面
+                        window.location.reload();
+                    } else {
+                        alert('添加失败');
+                    }
+                } catch (error) {
+                    console.error('添加用户失败:', error);
                     alert('添加失败');
                 }
-            } catch (error) {
-                console.error('添加用户失败:', error);
-                alert('添加失败');
-            }
-        });
+            });
 
-        // 初始化时检查用户类型
-        if (userTypeSelect.value === 'regular') {
-            timeLimitContainer.style.display = 'block'; // 显示时间限制选择框
+            // 初始化时检查用户类型
+            if (userTypeSelect.value === 'regular') {
+                timeLimitContainer.style.display = 'block'; // 显示时间限制选择框
+            }
         }
+
 
     </script>
 

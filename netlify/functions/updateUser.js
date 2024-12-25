@@ -1,5 +1,6 @@
 const { MongoClient, ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');  // 用于密码哈希处理
+const jwt = require('jsonwebtoken');
 
 const uri = "mongodb+srv://aa2231401652:4tvpB576PH2tI3mo@googlemaps.omgzf.mongodb.net/?retryWrites=true&w=majority&appName=GoogleMaps";
 
@@ -42,6 +43,14 @@ exports.handler = async function(event, context) {
         const regularUsersCollection = database.collection("regular_users");
         const trialUsersCollection = database.collection("trial_users");
 
+
+        // 验证token
+        const token = event.headers['authorization'].split(' ')[1];
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return event.status(401).json({ message: 'Token 无效或已过期' });
+        }
+        });
 
         // 判断 _id 是否是有效的 ObjectId
         let objectId;

@@ -101,7 +101,7 @@
         </form>
 
         <!-- 忘记密码链接 -->
-        <a href="#" class="forgot-password">忘记密码?</a>
+        <a href="#" class="forgot-password" >忘记密码?</a>
     </div>
     <script>
         // 获取表单元素
@@ -137,6 +137,10 @@
                 if (response.ok) {
                     // 登录成功
                     alert("登录成功！");
+
+                    // 将 token 存储到 localStorage 中
+                    localStorage.setItem('authToken', data.token);
+
                     // 根据返回的用户信息，可以进行进一步操作，比如跳转到管理页面
                     console.log("用户信息:", data.user);
                     // 转跳页面
@@ -151,6 +155,15 @@
                 console.error("请求失败:", error);
                 alert("请求失败，请稍后再试");
             }
+        });
+
+
+        // 监听 "忘记密码" 链接的点击事件
+        document.querySelector('.forgot-password').addEventListener('click', function(event) {
+            event.preventDefault();  // 防止链接的默认跳转行为
+
+            // 弹出联系管理员的信息
+            alert('请联系管理员进行密码重置 \n邮箱: aa2231401652@gmail.com');
         });
     </script>
 </body>

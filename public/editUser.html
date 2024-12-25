@@ -191,8 +191,24 @@
 
         // 获取用户数据并展示
         async function fetchUsers() {
+            // 从 localStorage 中获取 token
+            const token = localStorage.getItem('authToken');
+
+            // 如果 token 不存在，提示用户需要登录
+            if (!token) {
+                alert('请先登录');
+                window.location.href = 'login.html';  // 跳转到登录页面
+                return;
+            }
+
             try {
-                const response = await fetch('/.netlify/functions/getUsers');
+                const response = await fetch('/.netlify/functions/getUsers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const usersData = await response.json();
                 // 检查返回的数据是否为空或不是数组
                 if (Array.isArray(usersData) && usersData.length > 0) {
@@ -298,11 +314,15 @@
             };
 
             try {
+                // 从 localStorage 中获取 token
+                const token = localStorage.getItem('authToken');
+
                 // 发送更新请求到后端 (假设有对应的 API)
                 const response = await fetch('/.netlify/functions/updateUser', {
                     method: 'POST', // or 'PUT', 根据您的后端 API 设计
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(updatedUser)
                 });

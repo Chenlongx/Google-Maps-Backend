@@ -1,5 +1,5 @@
 const { MongoClient, ObjectId } = require('mongodb');  // 引入 ObjectId
-
+const jwt = require('jsonwebtoken');
 
 // MongoDB Atlas 连接字符串
 const uri = "mongodb+srv://aa2231401652:4tvpB576PH2tI3mo@googlemaps.omgzf.mongodb.net/?retryWrites=true&w=majority&appName=GoogleMaps";
@@ -46,6 +46,14 @@ exports.handler = async function (event, context) {
         const regularUsersCollection = database.collection("regular_users");
         const trialUsersCollection = database.collection("trial_users");
 
+
+        // 验证token
+        const token = event.headers['authorization'].split(' ')[1];
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return event.status(401).json({ message: 'Token 无效或已过期' });
+        }
+        });
 
 
         // 删除用户（同时处理两个集合）
